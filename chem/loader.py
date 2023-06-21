@@ -429,7 +429,6 @@ class MoleculeDataset(InMemoryDataset):
             smiles_list, rdkit_mol_objs, labels = \
                 _load_tox21_dataset(self.raw_paths[0])
             for i in range(len(smiles_list)):
-                print(i)
                 rdkit_mol = rdkit_mol_objs[i]
                 ## convert aromatic bonds to double bonds
                 #Chem.SanitizeMol(rdkit_mol,

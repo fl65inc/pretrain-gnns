@@ -17,7 +17,7 @@ def predict(num_layer=5, csize=3, mode='cbow', batch_size=1, num_workers=1):
     print("num layer: %d l1: %d l2: %d" %(num_layer, l1, l2))
 
     #set up dataset and transform function.
-    dataset = MoleculeDataset("/tmp/dataset", dataset='tox21', transform = ExtractSubstructureContextPair(num_layer, l1, l2))
+    dataset = MoleculeDataset("/tmp/dataset", dataset='tox21')
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers = num_workers)
 
     #set up models, one for pre-training and one for context embeddings
@@ -25,10 +25,11 @@ def predict(num_layer=5, csize=3, mode='cbow', batch_size=1, num_workers=1):
     saved_model = GNN_graphpred(num_layer, 300, num_tasks)
     saved_model.from_pretrained('model_gin/contextpred.pth')
     saved_model.to(device)
-    for batch in tqdm(loader):
-        print(batch.x, batch.edge_index, batch.edge_attr, batch.batch)
-        batch.to(device)
-        with torch.no_grad():
+    with torch.no_grad():
+        for batch in tqdm(loader):
+            print(batch)
+            batch.to(device)
+            
             prediction = saved_model(batch)
             print(prediction)
 
