@@ -165,6 +165,7 @@ class BatchSubstructContext(Data):
         i = 0
         
         for data in data_list:
+            print('DATA', data)
             #If there is no context, just skip!!
             if hasattr(data, "x_context"):
                 num_nodes = data.num_nodes

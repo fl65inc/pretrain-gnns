@@ -259,7 +259,8 @@ class GNN(torch.nn.Module):
             x, edge_index, edge_attr = data.x, data.edge_index, data.edge_attr
         else:
             raise ValueError("unmatched number of arguments.")
-
+        print(x)
+        print(self.x_embedding1, self.x_embedding2)
         x = self.x_embedding1(x[:,0]) + self.x_embedding2(x[:,1])
 
         h_list = [x]

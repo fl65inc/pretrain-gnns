@@ -2,7 +2,7 @@ import torch
 from tqdm import tqdm
 from model import GNN_graphpred
 from loader import MoleculeDataset
-from dataloader import DataLoaderSubstructContext
+from torch_geometric.data import DataLoader
 from util import ExtractSubstructureContextPair
 
 def predict(num_layer=5, csize=3, mode='cbow', batch_size=1, num_workers=1):
@@ -18,17 +18,19 @@ def predict(num_layer=5, csize=3, mode='cbow', batch_size=1, num_workers=1):
 
     #set up dataset and transform function.
     dataset = MoleculeDataset("/tmp/dataset", dataset='tox21', transform = ExtractSubstructureContextPair(num_layer, l1, l2))
-    loader = DataLoaderSubstructContext(dataset, batch_size=batch_size, shuffle=True, num_workers = num_workers)
+    loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers = num_workers)
 
     #set up models, one for pre-training and one for context embeddings
     num_tasks = 12
     saved_model = GNN_graphpred(num_layer, 300, num_tasks)
-    saved_model.from_pretrained('model_gin/supervised_contextpred.pth')
+    saved_model.from_pretrained('model_gin/contextpred.pth')
+    saved_model.to(device)
     for batch in tqdm(loader):
         print(batch.x, batch.edge_index, batch.edge_attr, batch.batch)
         batch.to(device)
-        prediction = saved_model(batch.x, batch.edge_index, batch.edge_attr, batch.batch)
-        print(prediction)
+        with torch.no_grad():
+            prediction = saved_model(batch)
+            print(prediction)
 
 if __name__ == '__main__':
     predict()
